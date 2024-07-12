@@ -10,7 +10,6 @@ const io = new Server(server);
 const redis = require("redis");
 
 // initiate redis client directly
-
 app.get("/", async (req, res) => {
   res.json({
     data: "Hello user",
