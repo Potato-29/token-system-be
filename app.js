@@ -5,9 +5,10 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const tokenRouter = require("./api/router/token.router");
-const { db } = require("./config/db");
+const { db } = require("./config/db"); // this import is necessary to connect with mongodb
 const io = new Server(server);
 const redis = require("redis");
+const cors = require("cors");
 
 // initiate redis client directly
 app.get("/", async (req, res) => {
@@ -16,6 +17,7 @@ app.get("/", async (req, res) => {
   });
 });
 app.use(express.json());
+app.use(cors());
 
 // All api routes
 app.use("/token", tokenRouter);
