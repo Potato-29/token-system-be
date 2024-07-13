@@ -6,15 +6,21 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const tokenRouter = require("./api/router/token.router");
 const { db } = require("./config/db"); // this import is necessary to connect with mongodb
-const io = new Server(server);
-const redis = require("redis");
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
 const cors = require("cors");
+const { getWaitingCount } = require("./api/service/token.service");
+const {
+  handleDisconnect,
+  emitQueueLength,
+} = require("./api/helper/socketServices");
 
 // initiate redis client directly
 app.get("/", async (req, res) => {
-  res.json({
-    data: "Hello user",
-  });
+  res.send("<h1>Hello world</h1>");
 });
 app.use(express.json());
 app.use(cors());
@@ -22,17 +28,21 @@ app.use(cors());
 // All api routes
 app.use("/token", tokenRouter);
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
-  socket.on("chat message", (msg) => {
-    console.log("message: " + msg);
-    io.emit("chat message", msg);
+// intialize the socket connection
+io.on("connection", async (socket) => {
+  if (socket.connected) {
+    socket.on("disconnect", handleDisconnect);
+    emitQueueLength(io);
+    setInterval(async () => {
+      emitQueueLength(io);
+    }, 120000);
+  }
+});
+io.on("error", async () => {
+  io.emit("error", {
+    msg: "socket io failed to connect",
   });
 });
-
 let port = process.env.PORT;
 server.listen(port, () => {
   console.log(`listening on *:${port}`);

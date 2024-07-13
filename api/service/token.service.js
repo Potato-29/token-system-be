@@ -36,4 +36,11 @@ module.exports = {
       return null;
     }
   },
+  getWaitingCount: async () => {
+    const allTokens = await Token.find({ status: "pending" })
+      .sort({ createdAt: -1 })
+      .exec();
+    const queueLength = allTokens?.length - 1;
+    return queueLength;
+  },
 };
