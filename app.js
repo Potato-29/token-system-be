@@ -17,11 +17,7 @@ app.get("/", async (req, res) => {
   });
 });
 app.use(express.json());
-app.use(
-  cors({
-    origin: ["http://43.204.215.234/", "http://localhost:3000"],
-  })
-);
+app.use(cors());
 
 // All api routes
 app.use("/token", tokenRouter);
