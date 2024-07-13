@@ -8,7 +8,8 @@ const tokenRouter = require("./api/router/token.router");
 const { db } = require("./config/db"); // this import is necessary to connect with mongodb
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   },
 });
 const cors = require("cors");
