@@ -13,11 +13,11 @@ const io = new Server(server, {
   },
 });
 const cors = require("cors");
-const { getWaitingCount } = require("./api/service/token.service");
 const {
   handleDisconnect,
   emitQueueLength,
 } = require("./api/helper/socketServices");
+const { getWaitingCount } = require("./api/service/token.service");
 
 // initiate redis client directly
 app.get("/", async (req, res) => {

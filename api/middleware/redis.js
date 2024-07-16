@@ -9,6 +9,7 @@ let redisClient;
 })();
 
 async function cacheData(req, res, next) {
+  console.log(req.url);
   const keyName = req.url;
   let results;
   try {

@@ -1,3 +1,4 @@
+const { tokenStatuses } = require("../../constants/tokenStatus");
 const { Token } = require("../models/token");
 
 module.exports = {
@@ -24,10 +25,48 @@ module.exports = {
   },
 
   updateTokenStatus: async (id, status, message) => {
-    const updateToken = await Token.findByIdAndUpdate(
+    const { status: currentStatus } = await Token.findById(id);
+    let updateToken;
+    if (
+      currentStatus === tokenStatuses.PENDING &&
+      (status === tokenStatuses.RESOLVED ||
+        status === tokenStatuses.ON_HOLD ||
+        status === tokenStatuses.CLOSED)
+    ) {
+      return "Token is not picked yet";
+    }
+
+    if (
+      currentStatus === tokenStatuses.SERVING &&
+      status === tokenStatuses.PENDING
+    ) {
+      return "Token is currently serving.";
+    }
+
+    if (currentStatus === tokenStatuses.CLOSED) {
+      return "Token is already closed.";
+    }
+
+    if (currentStatus === tokenStatuses.CANCELLED) {
+      return "Token is already cancelled";
+    }
+
+    if (
+      currentStatus === tokenStatuses.ON_HOLD &&
+      status === tokenStatuses.PENDING
+    ) {
+      return "Token is on hold";
+    }
+
+    if (currentStatus === tokenStatuses.RESOLVED) {
+      return "Token is already resolved";
+    }
+
+    updateToken = await Token.findByIdAndUpdate(
       { _id: id },
       { status, statusMessage: message }
     ).exec();
+
     if (updateToken) {
       const updatedToken = await Token.findById(id).exec();
       return updatedToken;

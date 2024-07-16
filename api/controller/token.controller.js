@@ -52,6 +52,7 @@ module.exports = {
       const response = await getTokenInfo(id);
       if (response) {
         res.json({
+          fromCache: false,
           msg: "success",
           data: response,
         });
@@ -66,6 +67,7 @@ module.exports = {
           });
         }
       }
+      // await saveCache(req.url, response);
     } catch (error) {
       res.status(400).json({
         error: error.message,
