@@ -17,7 +17,7 @@ const {
   handleDisconnect,
   emitQueueLength,
 } = require("./api/helper/socketServices");
-const { getWaitingCount } = require("./api/service/token.service");
+const { Token } = require("./api/models/token");
 
 // initiate redis client directly
 app.get("/", async (req, res) => {
@@ -29,13 +29,21 @@ app.use(cors());
 // All api routes
 app.use("/token", tokenRouter);
 
+let updatedStatus;
+Token.watch().on("change", (data) => {
+  updatedStatus = data.updateDescription.updatedFields;
+});
+
 // intialize the socket connection
 io.on("connection", async (socket) => {
   if (socket.connected) {
     socket.on("disconnect", handleDisconnect);
     emitQueueLength(io);
+    io.emit("tokenStatusChanged", updatedStatus);
+
     setInterval(async () => {
       emitQueueLength(io);
+      io.emit("tokenStatusChanged", updatedStatus);
     }, 120000);
   }
 });
@@ -48,3 +56,5 @@ let port = process.env.PORT;
 server.listen(port, () => {
   console.log(`listening on *:${port}`);
 });
+
+module.exports = io;

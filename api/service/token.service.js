@@ -1,3 +1,5 @@
+const io = require("../../app");
+const { db } = require("../../config/db");
 const { tokenStatuses } = require("../../constants/tokenStatus");
 const { Token } = require("../models/token");
 
@@ -66,6 +68,16 @@ module.exports = {
       { _id: id },
       { status, statusMessage: message }
     ).exec();
+    // const collection = db.collection("tokens");
+    // const changeStream = collection.watch();
+    // changeStream.on("change", (change) => {
+    //   if (change.operationType === "update") {
+    //     const updatedFields = change.updateDescription.updatedFields;
+    //     // Emit the updated token status to the frontend via socket
+    //     io.emit("tokenStatusChanged", updatedFields);
+    //     console.log("done");
+    //   }
+    // });
 
     if (updateToken) {
       const updatedToken = await Token.findById(id).exec();
